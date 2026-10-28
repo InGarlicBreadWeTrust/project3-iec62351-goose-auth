@@ -1,0 +1,41 @@
+# checks/wire.yaml — wire-shape / framing checks (PROVISIONAL by default)
+# These are the highest-exposure, lowest-oracle checks. No public 2nd-implementation or
+# secured GOOSE capture exists for the 62351-6 Extension/AuthValue framing as of 2026-10-28,
+# so EVERY WIRE.* result is hard-capped at PROVISIONAL. The executor REFUSES to emit PASS.
+# See SECURITY_DESIGN.md §2.4, 0, and testvectors/README.md (anti-fabrication contract).
+# Declarative, language-neutral. See provenance/conformance.checks.md.
+
+version: "0.1"
+spec_refs:
+  - "IEC 62351-6:2020"
+  - "IEC 61850-8-1"
+as_of: "2026-10-28"
+checks:
+  - id: WIRE.1
+    title: "Extension tag 0x85 / AuthValue field order / BER Extension framing"
+    threat: T1
+    mechanism: "parse the 62351-6 security Extension off the GOOSE APDU"
+    inputs: [extension_bytes]
+    expected: "tag 0x85 present; AuthValue follows in spec field order; BER SEQUENCE framing"
+    oracle: PROVISIONAL
+    # No public 2nd impl / no real secured capture => PROVISIONAL is the ceiling.
+    hard_ceiling: PROVISIONAL
+    provisional_reason: "no public/2nd-implementation oracle or real secured GOOSE capture for the 62351-6 Extension wire shape (as of 2026-10-28)"
+    notes: >
+      The 61850-8-1 Reserved1/Reserved2 = 0x0000 signal means "unsecured extension" — this
+      is the oracle-free default. Real secured frames are simply ABSENT from public captures.
+      Any PASS here would be fabrication; the harness forbids it.
+
+  - id: ENC.1
+    title: "Encryption: AES-GCM/CBC decrypt + tag verify (only where 3ms budget allows)"
+    threat: T5
+    mechanism: "AES-GCM/CBC authenticated decryption of a confidential GOOSE/SV payload"
+    inputs: [ciphertext, gcm_tag, iv, key]
+    expected: "decrypts and tag verifies; where encryption is off, mark 'extension-absent / unsecured'"
+    oracle: PROVISIONAL
+    hard_ceiling: PROVISIONAL
+    provisional_reason: "wire shape for encoded/confidential 62351-6 GOOSE unsettled; encryption off by default for the <3ms trip class"
+    notes: >
+      62351-6 does NOT encrypt by default for the <3ms (trip) class — confidentiality is
+      expected from LAN path-selection / ESP restriction, and the extension carries a MAC
+      (auth), not a ciphertext. So "secure" here mostly means message-auth + replay.

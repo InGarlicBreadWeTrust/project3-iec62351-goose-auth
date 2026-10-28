@@ -15,6 +15,9 @@ id_rsa
 *.dylib
 *.a
 *.o
+__pycache__/
+*.pyc
+*.pyo
 build/
 target/
 dist/

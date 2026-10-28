@@ -1,0 +1,3 @@
+PyYAML>=6.0
+# That is the only third-party dependency for the reference executor.
+# Python 3.11+ standard library otherwise. (A 0.2 Go/Rust port needs zero deps.)

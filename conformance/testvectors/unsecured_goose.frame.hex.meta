@@ -1,0 +1,21 @@
+{
+  "_seed": true,
+  "name": "unsecured_goose",
+  "kind": "front",
+  "class": "unsecured",
+  "spec_refs": ["IEC 61850-8-1"],
+  "oracle_tier": "PUBLIC-FRONT",
+  "note": "Synthetic unsecured GOOSE front. The 8-byte front (TPID/stNum/sqNum/reserved) "
+          "is the well-known, uncontested part of the APDU => PUBLIC; everything behind the "
+          "62351-6 extension is OUT OF SCOPE (PROVISIONAL). Demonstrates the unsecured path, "
+          "where replay-only protection must still apply.",
+  "hex": "01 01 00 2a 00 00 00 00",
+  "expected": {
+        "extension_present": false,
+        "stnumber": 42,
+        "WIRE.1_status": "PROVISIONAL",
+        "ENC.1_status": "PROVISIONAL",
+        "REPL.1_status": "PASS"
+  },
+  "do_not_read_as": "conformance"
+}

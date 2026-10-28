@@ -1,0 +1,23 @@
+# checks/keymgmt.yaml — key management surface (IEC 62351-9 / GDOI), protocol-stub level
+# v0.1 checks key behaviour against fixtures; it does NOT run a GDOI server.
+# Declarative, language-neutral. See provenance/conformance.checks.md.
+
+version: "0.1"
+spec_refs:
+  - "IEC 62351-9:2019"
+  - "IEC 62351-6:2020"
+as_of: "2026-10-28"
+checks:
+  - id: KEY.1
+    title: "Key management: unknown/expired keyID => transition to failure + GROUP-PULL + alarm"
+    threat: T5
+    mechanism: "frame keyID matched against local key ring; unknown/expired => GROUP-PULL"
+    inputs: [frame_keyid, local_keyring, key_expiry]
+    expected: "unknown or expired key => transition to failure, perform GROUP-PULL, raise alarm; do NOT keep decrypting with a dead key"
+    oracle: PUBLIC
+    notes: >
+      Verify the subscriber TRANSITIONS and PULLS, not just keeps decrypting with a dead
+      key. 62351-9/ GDOI key-delivery semantics are published text. At least one
+      GOOSESecurity (and SVSecurity) instance per claiming IED.
+    # Protocol behaviour is published: checkable without an oracle.
+    provisionality: NONE

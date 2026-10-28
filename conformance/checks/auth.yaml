@@ -1,0 +1,49 @@
+# checks/auth.yaml — message-authentication + IV/nonce checks
+# Declarative, language-neutral. The executor (conformance/executor/) re-drives this table.
+# A second implementation (Go/Rust, v0.2) re-drives the SAME file — no code rewrite.
+#
+# PROVENANCE: clean-room, published-spec-only reading. No reference-impl source,
+# no paid capture consulted. See provenance/conformance.checks.md.
+# Oracle legend:
+#   PUBLIC            = the behaviour is defined in published text; checkable without an oracle.
+#   PARTIAL           = primitive known, but a part (the wire shape) is PROVISIONAL.
+#   PROVISIONAL       = exact wire shape / construction has no public or 2nd-impl oracle.
+#
+# Anti-fabrication: `hard_ceiling: PROVISIONAL` means the executor FORCES this check to
+# PROVISIONAL:<reason> and REFUSES to emit PASS even if the internal logic "succeeds",
+# because no traceable 2nd-impl or secured-capture oracle exists for the wire shape.
+
+version: "0.1"
+spec_refs:
+  - "IEC 62351-6:2020"
+  - "IEC 61850-8-1"
+  - "IEEE P2030.100.2 (2026)"
+as_of: "2026-10-28"
+checks:
+  - id: AUTH.1
+    title: "Authentication: MAC over APDU keyed by publication/group key"
+    threat: T1
+    mechanism: "AES-GMAC / HMAC-SHA-256 trunc128 over APDU bytes before the extension tag"
+    inputs: [group_key, apdu, optional_iv]
+    expected: "recomputed MAC == frame AuthValue; mismatch => reject the frame"
+    oracle: PARTIAL
+    notes: >
+      Symmetric group key => any group member can forge any publisher's frame.
+      AUTH != publisher-auth. Flag this loudly (T1). 62351-6 secures message
+      integrity/authenticity, not publisher identity.
+    # MAC primitive is known; the exact AuthValue field-order/wire framing is unsettled.
+    provisionality: PROVISIONAL_CONSTRUCTION
+
+  - id: IV.1
+    title: "IV/nonce source exists, per-publisher, non-repeating under GMAC"
+    threat: T4
+    mechanism: "GMAC requires an IV per message; 62351-9 hands the SAME group key to every IED"
+    inputs: [gmac_mode, iv_source, publisher_id]
+    expected: "an IV exists AND is partitioned per-publisher (never constant)"
+    oracle: PUBLIC
+    notes: >
+      Reused (key,IV) under GMAC leaks the GHASH subkey => anyone can forge any frame.
+      This is the T4 footgun and MUST be a first-class check. The IV *must* exist & vary
+      (PUBLIC); its exact *construction* from (publication, time, counter) is PROVISIONAL.
+    # Behaviour is public ("an IV must exist and vary"); the construction is PROVISIONAL.
+    provisionality: PROVISIONAL_CONSTRUCTION

@@ -1,0 +1,24 @@
+# checks/replay.yaml — replay / freshness checks
+# Declarative, language-neutral. Executor re-drives this table.
+# PROVENANCE: clean-room, published-spec-only. See provenance/conformance.checks.md.
+
+version: "0.1"
+spec_refs:
+  - "IEC 62351-6:2020"
+  - "IEC 61850-8-1"
+as_of: "2026-10-28"
+checks:
+  - id: REPL.1
+    title: "Replay protection: window over (stNum, sqNum) + TimeAllowedToLive"
+    threat: T2
+    mechanism: "stNum/sqNum freshness window; stale => discard; current => accept; retransmits not dropped"
+    inputs: [frame_stnum, frame_sqnum, frame_tal, window_state]
+    expected: "stale/replayed frame discarded; legitimate retransmit NOT discarded"
+    oracle: PUBLIC
+    notes: >
+      Window must respect GOOSE retransmission semantics (stNum bumps, TAL). A naive
+      window drops legitimate retransmits; a loose loop accepts replays. 62351-6 replay
+      protection applies to GOOSE and Multicast SV, with OR without the security
+      extension (informative clause) — so cover the unsecured path as "replay-only".
+    # Published window semantics: checkable without an oracle.
+    provisionality: NONE
