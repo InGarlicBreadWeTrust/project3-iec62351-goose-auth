@@ -1,0 +1,38 @@
+# grid-ot / project3 — IEC 62351-6 secure-GOOSE verifier
+# defense-direction; no secrets; no unredacted captures.
+
+# secrets / keys / certs
+*.env
+.env
+*.pem
+*.pfx
+*.p12
+*.crt
+*.key
+id_*.pem
+id_rsa
+*.so
+*.dylib
+*.a
+*.o
+build/
+target/
+dist/
+*.log
+nohup.out
+
+# test data — only REDACTED metadata + pointer allowed; never real unredacted frames
+testvectors/captures_raw/
+testvectors/*.pcapng
+!testvectors/README.md
+!testvectors/ingest.md
+!testvectors/manifest.yaml
+
+# OS / editor
+.DS_Store
+~$*
+*~
+
+# build outputs
+*.exe
+vendor/
