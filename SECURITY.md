@@ -31,4 +31,12 @@ See `SECURITY_DESIGN.md` and `PRD.md`. The conformance executor is intentionally
 passive: it parses and asserts conformance of captured/recorded GOOSE frames; it
 does not drive protection commands.
 
-<!-- TODO(maintainer): fill in a real disclosure channel / PGP key here. -->
+## Contact
+
+- Open a new **draft issue** in this repo and label it `security` — GitHub
+  notifies the owner (`@InGarlicBreadWeTrust`) immediately.
+- Or contact the owner directly via the GitHub Contact-owner interface at
+  `https://github.com/InGarlicBreadWeTrust` (also in the "About" sidebar).
+- PGP key: not published yet. Send reports in clear text via a draft issue;
+  for encrypted contact, request the key in your first message and we will
+  respond out-of-band.
